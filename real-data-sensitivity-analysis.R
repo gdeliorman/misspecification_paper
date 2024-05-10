@@ -10,7 +10,7 @@ Schizo = na.omit(Schizo)
 
 # Number of unidentifiable copula parameter sets for each data set and
 # additional assumptions.
-n_sim = 5
+n_sim = 20
 # Number of Monte Carlo samples to compute the ICA.
 n_prec = 5e3
 # Number of cores to use in computations.
