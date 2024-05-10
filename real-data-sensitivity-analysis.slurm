@@ -15,7 +15,7 @@ module load CMake
 module load  R/4.3.2-foss-2022b
 
 Rscript -e "renv::restore()" -e "Sys.setenv(TZ='Europe/Brussels')"
-Rscript .R 71
+Rscript real-data-sensitivity-analysis.R 
 
 
 
