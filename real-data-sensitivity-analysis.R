@@ -57,6 +57,19 @@ mvn_est_tbl = tibble(
     )
 )
 
+# Save information about fitted multivariate normal distributions to a .txt
+# file.
+sink("tables/web-appendices/mvn-estimates.txt")
+print(mvn_est_tbl %>%
+        rowwise(data_set) %>%
+        summarize(control_mean_S = mvn_estimates$control[1],
+                  control_mean_T = mvn_estimates$control[2],
+                  control_corr = mvn_estimates$control[3],
+                  treat_mean_S = mvn_estimates$control[1],
+                  treat_mean_T = mvn_estimates$control[2],
+                  treat_corr = mvn_estimates$control[3]))
+sink()
+
 # Unidentifiable Copula Families ------------------------------------------
 
 # Copula families under considerations.
