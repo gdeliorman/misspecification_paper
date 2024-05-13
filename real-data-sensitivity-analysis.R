@@ -3,7 +3,7 @@
 args = commandArgs(trailingOnly=TRUE)
 options(RENV_CONFIG_SANDBOX_ENABLED = FALSE)
 Sys.setenv(TZ='Europe/Brussels')
-ncores = as.integer(args[1])
+n_cores = as.integer(args[1])
 # Print R-version for better reproducibility.
 print(version)
 # Ensure to the state of packages is up-to-date.
