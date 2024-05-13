@@ -4,6 +4,18 @@ library(dplyr)
 library(lme4)
 library(Matrix)
 
+# Size parameter for saving plots to disk.
+single_width = 9
+double_width = 14
+single_height = 8.2
+double_height = 12.8
+res = 600
+
+# Set the theme for all plots.
+theme_set(
+  theme_bw()
+)
+
 # Load data set containing the computed ICAs for all scenarios.
 results_ICA_tbl = readRDS("results_ICA_tbl.rds")
 copula_id_tbl = readRDS("copula_id_tbl.rds")
@@ -33,21 +45,50 @@ results_ICA_tbl = results_ICA_tbl %>%
 
 # Data Visualization ------------------------------------------------------
 results_ICA_tbl %>%
+  mutate(
+    assumptions = forcats::fct_recode(
+      assumptions,
+      "-" = "no",
+      "PA" = "positive associations",
+      "PA + CI" = "positive associations and conditional independence"
+    )
+  ) %>%
   ggplot(aes(x = mean_ICA, y = ICA)) +
-  geom_point() +
+  geom_point(alpha = 0.01, size = 1) +
   geom_abline(intercept = 0, slope = 1) +
   xlim(c(0, 1)) +
+  xlab(latex2exp::TeX("$\\bar{ICA}$")) +
   ylim(c(0, 1)) +
-  facet_grid(data_set~assumptions)
+  facet_grid(data_set ~ assumptions)
+ggsave(filename = "figures/web-appendices/vine-copula-mean-reference.png",
+       device = "png",
+       width = double_width,
+       height = double_height,
+       units = "cm",
+       dpi = res)
 
 results_ICA_tbl %>%
+  mutate(
+    assumptions = forcats::fct_recode(
+      assumptions,
+      "-" = "no",
+      "PA" = "positive associations",
+      "PA + CI" = "positive associations and conditional independence"
+    )
+  ) %>%
   ggplot(aes(x = mvn_ICA, y = ICA)) +
-  geom_point() +
+  geom_point(alpha = 0.01, size = 1) +
   geom_abline(intercept = 0, slope = 1) +
   xlim(c(0, 1)) +
+  xlab(latex2exp::TeX("$ICA_{MVN}$")) +
   ylim(c(0, 1)) +
   facet_grid(data_set~assumptions)
-
+ggsave(filename = "figures/main-text/vine-copula-mvn-reference.png",
+       device = "png",
+       width = double_width,
+       height = double_height,
+       units = "cm",
+       dpi = res)
 
 # Reliability Analysis ----------------------------------------------------
 
