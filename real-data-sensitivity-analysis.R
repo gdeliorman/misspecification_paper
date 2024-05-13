@@ -1,3 +1,14 @@
+#!/usr/bin/env Rscript
+.libPaths()
+args = commandArgs(trailingOnly=TRUE)
+options(RENV_CONFIG_SANDBOX_ENABLED = FALSE)
+Sys.setenv(TZ='Europe/Brussels')
+ncores = as.integer(args[1])
+# Print R-version for better reproducibility.
+print(version)
+# Ensure to the state of packages is up-to-date.
+renv::restore()
+# Load the required packages.
 library(Surrogate)
 library(tidyr)
 library(dplyr)
@@ -10,11 +21,9 @@ Schizo = na.omit(Schizo)
 
 # Number of unidentifiable copula parameter sets for each data set and
 # additional assumptions.
-n_sim = 20
+n_sim = 1e2
 # Number of Monte Carlo samples to compute the ICA.
-n_prec = 5e3
-# Number of cores to use in computations.
-n_cores = 10
+n_prec = 1e4
 # Seed for reproducibility.
 set.seed(1)
 
