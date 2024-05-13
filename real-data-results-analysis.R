@@ -29,11 +29,20 @@ results_ICA_tbl %>%
 # Reliability Analysis ----------------------------------------------------
 
 # Fit mixed model for each data set-assumptions combination.
-results_ICA_tbl %>%
+results_ICA_tbl = results_ICA_tbl %>%
   group_by(data_set, assumptions) %>%
   summarize(lme_fit = list(lmer(
     ICA ~ 1 + (1 | id) + (1 | copula_id), data = pick(everything())
   )))
 
 # Extract Reliability coefficients.
+reliability_coef = function(lme_fit) {
+  coefficients = as.data.frame(VarCorr(lme_fit))
+  copula_id_var = coefficients$vcov[coefficients$grp == "copula_id"]
+  id_var = coefficients$vcov[coefficients$grp == "id"]
+  residual_var = coefficients$vcov[coefficients$grp == "Residual"]
+  return(id_var / (residual_var + id_var + copula_id_var))
+}
+results_ICA_tbl = results_ICA_tbl %>%
+  mutate(reliability = purrr::map_dbl(.x = lme_fit, .f = reliability_coef))
 
