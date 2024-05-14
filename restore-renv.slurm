@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#SBATCH --job-name=meta-TCT-simulations
+#SBATCH --job-name=restore-renv-misspecification
 #SBATCH --ntasks=1 --cpus-per-task=2
 #SBATCH --time=01:45:00
 #SBATCH --cluster=wice
