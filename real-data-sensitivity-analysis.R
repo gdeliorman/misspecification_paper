@@ -106,7 +106,7 @@ sp_rho_df2 = tibble(
 # Positive restricted associations and conditional independence.
 sp_rho_df3 = tibble(
   sp_rho23 = runif(n_sim, 0.2, 0.95),
-  sp_rho13_2 = runif(n_sim, 0, 0.5),
+  sp_rho13_2 = 0,
   sp_rho24_3 = sp_rho13_2,
   sp_rho14_23 = runif(n_sim, 0.15, 0.80),
 )
