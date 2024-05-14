@@ -298,7 +298,7 @@ copula_pm_tbl = copula_pm_tbl %>%
   ungroup()
 
 a = Sys.time()
-cl = parallel::makeCluster(n_cores)
+cl = parallel::makeCluster(n_cores, type = "FORK")
 parallel::clusterEvalQ(cl, library(Surrogate))
 parallel::clusterEvalQ(cl, library(dplyr))
 parallel::clusterExport(cl, c("compute_ICA", "n_prec"))
