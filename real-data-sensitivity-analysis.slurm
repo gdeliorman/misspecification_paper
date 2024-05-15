@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #SBATCH --job-name=meta-TCT-simulations
-#SBATCH --ntasks=1 --cpus-per-task=36
+#SBATCH --ntasks=1 --cpus-per-task=72
 #SBATCH --time=01:10:00
 #SBATCH --cluster=wice
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -15,7 +15,7 @@ module load CMake
 module load  R/4.2.2-foss-2022b
 
 Rscript -e "renv::restore()" -e "Sys.setenv(TZ='Europe/Brussels')"
-Rscript real-data-sensitivity-analysis.R 35
+Rscript real-data-sensitivity-analysis.R 71
 
 
 
