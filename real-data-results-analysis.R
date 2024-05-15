@@ -55,10 +55,10 @@ results_ICA_tbl %>%
   ) %>%
   ggplot(aes(x = mean_ICA, y = ICA)) +
   geom_point(alpha = 0.01, size = 1) +
-  geom_abline(intercept = 0, slope = 1) +
-  xlim(c(0, 1)) +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  xlim(c(-0.1, 1)) +
   xlab(latex2exp::TeX("$\\bar{ICA}$")) +
-  ylim(c(0, 1)) +
+  ylim(c(-0.1, 1)) +
   facet_grid(data_set ~ assumptions)
 ggsave(filename = "figures/web-appendices/vine-copula-mean-reference.png",
        device = "png",
@@ -78,10 +78,10 @@ results_ICA_tbl %>%
   ) %>%
   ggplot(aes(x = mvn_ICA, y = ICA)) +
   geom_point(alpha = 0.01, size = 1) +
-  geom_abline(intercept = 0, slope = 1) +
-  xlim(c(0, 1)) +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  xlim(c(-0.1, 1)) +
   xlab(latex2exp::TeX("$ICA_{MVN}$")) +
-  ylim(c(0, 1)) +
+  ylim(c(-0.1, 1)) +
   facet_grid(data_set~assumptions)
 ggsave(filename = "figures/main-text/vine-copula-mvn-reference.png",
        device = "png",
@@ -109,4 +109,15 @@ reliability_coef = function(lme_fit) {
 }
 results_ICA_tbl = results_ICA_tbl %>%
   mutate(reliability = purrr::map_dbl(.x = lme_fit, .f = reliability_coef))
+
+# Print results to .txt file
+sink(file = "tables/web-appendices/reliability-estimates.txt")
+cat("Estimated reliability coefficients for each scenario.\n\n")
+print(
+  results_ICA_tbl %>%
+    select(-lme_fit) %>%
+    mutate(assumptions = forcats::fct_recode(assumptions, "no assumptions" = "no")) %>%
+    pivot_wider(names_from = "assumptions", id_cols = "data_set", values_from = "reliability")
+)
+sink()
 
