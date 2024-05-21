@@ -157,6 +157,7 @@ sp_rho_to_copula = function(sp_rho, copula_fam) {
   if (copula_fam == "clayton")
     c_pm = ifelse(sp_rho < 5 * 1e-04, 1e-05, c_pm)
   c_pm = ifelse(c_pm > upper_limit | is.na(c_pm), upper_limit, c_pm)
+  c_pm = ifelse(c_pm < -1 * upper_limit | is.na(c_pm), -1 * upper_limit, c_pm)
   return(c_pm)
 }
 
