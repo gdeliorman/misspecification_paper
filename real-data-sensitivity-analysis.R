@@ -1,3 +1,14 @@
+#!/usr/bin/env Rscript
+.libPaths()
+args = commandArgs(trailingOnly=TRUE)
+options(RENV_CONFIG_SANDBOX_ENABLED = FALSE)
+Sys.setenv(TZ='Europe/Brussels')
+n_cores = as.integer(args[1])
+# Print R-version for better reproducibility.
+print(version)
+# Ensure to the state of packages is up-to-date.
+renv::restore()
+# Load the required packages.
 library(Surrogate)
 library(tidyr)
 library(dplyr)
@@ -10,11 +21,9 @@ Schizo = na.omit(Schizo)
 
 # Number of unidentifiable copula parameter sets for each data set and
 # additional assumptions.
-n_sim = 5
+n_sim = 1e3
 # Number of Monte Carlo samples to compute the ICA.
-n_prec = 5e3
-# Number of cores to use in computations.
-n_cores = 10
+n_prec = 1e4
 # Seed for reproducibility.
 set.seed(1)
 
@@ -47,6 +56,19 @@ mvn_est_tbl = tibble(
          treat = estimate_mvn(Schizo$CGI[Schizo$Treat == 1], Schizo$PANSS[Schizo$Treat == 1]))
     )
 )
+
+# Save information about fitted multivariate normal distributions to a .txt
+# file.
+sink("tables/web-appendices/mvn-estimates.txt")
+print(mvn_est_tbl %>%
+        rowwise(data_set) %>%
+        summarize(control_mean_S = mvn_estimates$control[1],
+                  control_mean_T = mvn_estimates$control[2],
+                  control_corr = mvn_estimates$control[3],
+                  treat_mean_S = mvn_estimates$control[1],
+                  treat_mean_T = mvn_estimates$control[2],
+                  treat_corr = mvn_estimates$control[3]))
+sink()
 
 # Unidentifiable Copula Families ------------------------------------------
 
@@ -84,7 +106,7 @@ sp_rho_df2 = tibble(
 # Positive restricted associations and conditional independence.
 sp_rho_df3 = tibble(
   sp_rho23 = runif(n_sim, 0.2, 0.95),
-  sp_rho13_2 = runif(n_sim, 0, 0.5),
+  sp_rho13_2 = 0,
   sp_rho24_3 = sp_rho13_2,
   sp_rho14_23 = runif(n_sim, 0.15, 0.80),
 )
@@ -135,6 +157,7 @@ sp_rho_to_copula = function(sp_rho, copula_fam) {
   if (copula_fam == "clayton")
     c_pm = ifelse(sp_rho < 5 * 1e-04, 1e-05, c_pm)
   c_pm = ifelse(c_pm > upper_limit | is.na(c_pm), upper_limit, c_pm)
+  c_pm = ifelse(c_pm < -1 * upper_limit | is.na(c_pm), -1 * upper_limit, c_pm)
   return(c_pm)
 }
 
@@ -149,70 +172,6 @@ rotation = function(sp_rho, copula_fam) {
     return(0)
 }
 
-# Combine parametric copulas and sample parameters into the same data set. 
-copula_pm_tbl = copula_fam_df %>%
-  cross_join(
-    copula_sp_rho_tbl
-  )
-
-# Convert the Spearman's rho value to the corresponding value on the copula
-# parameter scale for all four copulas. These values are computed before
-# constructing the tibble with all possible vine copulas. This avoids computing
-# the same copula parameter value multiple times.
-copula_pm_tbl = copula_sp_rho_tbl %>%
-  cross_join(tibble(copula_fam = c("gaussian", "clayton", "frank", "gumbel"))) %>%
-  mutate(
-    c23_pm = purrr::map2_dbl(
-      .x = sp_rho23,
-      .y = copula_fam,
-      .f = sp_rho_to_copula
-    ),
-    r23 = purrr::map2_dbl(.x = sp_rho23, .y = copula_fam, .f = rotation),
-    c13_2_pm = purrr::map2_dbl(
-      .x = sp_rho13_2,
-      .y = copula_fam,
-      .f = sp_rho_to_copula
-    ),
-    r13_2 = purrr::map2_dbl(.x = sp_rho13_2, .y = copula_fam, .f = rotation),
-    c24_3_pm = purrr::map2_dbl(
-      .x = sp_rho24_3,
-      .y = copula_fam,
-      .f = sp_rho_to_copula
-    ),
-    r24_3 = purrr::map2_dbl(.x = sp_rho24_3, .y = copula_fam, .f = rotation),
-    c14_23_pm = purrr::map2_dbl(
-      .x = sp_rho14_23,
-      .y = copula_fam,
-      .f = sp_rho_to_copula
-    ),
-    r14_23 = purrr::map2_dbl(.x = sp_rho14_23, .y = copula_fam, .f = rotation)
-  )
-
-# We consider all possible combinations of unidentifiable copulas. 
-copula_pm_tbl = copula_pm_tbl %>%
-  select(sp_rho23, copula_fam, c23_pm, r23, id, assumptions) %>%
-  rename(c23 = copula_fam) %>%
-  left_join(
-    copula_pm_tbl %>%
-      select(sp_rho13_2, copula_fam, c13_2_pm, r13_2, id, assumptions) %>%
-      rename(c13_2 = copula_fam),
-    by = c("id", "assumptions"),
-    relationship = "many-to-many"
-  ) %>%
-  left_join(
-    copula_pm_tbl %>%
-      select(sp_rho24_3, copula_fam, c24_3_pm, r24_3, id, assumptions) %>%
-      rename(c24_3 = copula_fam),
-    by = c("id", "assumptions"),
-    relationship = "many-to-many"
-  ) %>%
-  left_join(
-    copula_pm_tbl %>%
-      select(sp_rho14_23, copula_fam, c14_23_pm, r14_23, id, assumptions) %>%
-      rename(c14_23 = copula_fam),
-    by = c("id", "assumptions"),
-    relationship = "many-to-many"
-  )
 # Add copula ID. This is useful later one to keep the data set smaller.
 copula_id_tbl = expand_grid(
   c23 = copula_fam_vec,
@@ -221,8 +180,6 @@ copula_id_tbl = expand_grid(
   c14_23 = copula_fam_vec
 ) %>%
   mutate(copula_id = row_number())
-copula_pm_tbl = copula_pm_tbl %>%
-  left_join(copula_id_tbl)
 
 
 # Compute ICA  ------------------------------------------------------------
@@ -264,32 +221,44 @@ compute_ICA = function(copula_fam, mvn_est, c_unid, r_unid) {
 # Compute ICA for every D-vine copula distribution in copula_pm_tbl and every
 # estimated bivariate margin. Because this step is computer intensive, we use
 # parallel computing.
-copula_pm_tbl = copula_pm_tbl %>%
-  cross_join(mvn_est_tbl) %>%
-  rowwise(everything()) %>%
-  summarise(arguments_list = list(list(
-    copula_fam = c(c23, c13_2, c24_3, c14_23),
-    c_unid = c(c23_pm, c13_2_pm, c24_3_pm, c14_23_pm),
-    r_unid = c(r23, r13_2, r24_3, r14_23),
-    mvn_estimates = mvn_estimates
-  ))) %>%
-  ungroup()
+
+# Consider all possible combinations of (i) sampled Spearman's rho values, (ii)
+# parametric copulas, and (iii) data sets.
+all_settings_tbl = expand_grid(
+  copula_id = copula_id_tbl$copula_id,
+  id = copula_sp_rho_tbl$id, 
+  data_set = c("ARMD", "Schizo", "Ovarian")
+)
 
 a = Sys.time()
-cl = parallel::makeCluster(n_cores)
+cl = parallel::makeCluster(n_cores, type = "FORK")
 parallel::clusterEvalQ(cl, library(Surrogate))
 parallel::clusterEvalQ(cl, library(dplyr))
-parallel::clusterExport(cl, c("compute_ICA", "n_prec"))
-arguments_list = copula_pm_tbl %>%
-  `$`("arguments_list")
-ICA = parallel::clusterApply(
-  x = arguments_list,
-  fun = function(arguments_list) {
+parallel::clusterExport(cl,
+                        c(
+                          "compute_ICA",
+                          "n_prec",
+                          "copula_id_tbl",
+                          "copula_sp_rho_tbl",
+                          "mvn_est_tbl", 
+                          "sp_rho_to_copula",
+                          "rotation"
+                        ))
+ICA = parallel::clusterMap(
+  copula_id = all_settings_tbl$copula_id,
+  id = all_settings_tbl$id,
+  data_set = all_settings_tbl$data_set,
+  fun = function(copula_id, id, data_set) {
+    copula_fam = as.character(copula_id_tbl[copula_id_tbl$copula_id == copula_id, 1:4])
+    mvn_estimates = mvn_est_tbl$mvn_estimates[mvn_est_tbl$data_set == data_set][[1]]
+    sp_rho = as.numeric(copula_sp_rho_tbl[copula_sp_rho_tbl$id == id, 1:4])
+    c_unid = purrr::map2_dbl(.x = sp_rho, .y = copula_fam, .f = sp_rho_to_copula)
+    r_unid = purrr::map2_dbl(.x = sp_rho, .y = copula_fam, .f = rotation)
     compute_ICA(
-      arguments_list$copula_fam,
-      arguments_list$mvn_estimates,
-      arguments_list$c_unid,
-      arguments_list$r_unid
+      copula_fam,
+      mvn_estimates,
+      c_unid,
+      r_unid
     )["ICA"]
   },
   cl = cl
@@ -298,10 +267,11 @@ ICA = parallel::clusterApply(
 parallel::stopCluster(cl)
 print(Sys.time() - a)
 
-# To save space, we split the results_tbl into small blocks without losing
-# information.
-results_ICA_tbl = copula_pm_tbl %>%
-  select(id, copula_id, assumptions, data_set) %>%
+# To save space, we leave the results split over three files. The
+# results_ICA_tbl.rds file contains the "real" results. The other two files just
+# allows us to retrieve the specific parametric copulas and Spearman's rho
+# parameters to which a computed ICA corresponds.
+results_ICA_tbl = all_settings_tbl %>%
   mutate(ICA = ICA)
 saveRDS(results_ICA_tbl, file = "results_ICA_tbl.rds")
 id_tbl = copula_sp_rho_tbl
