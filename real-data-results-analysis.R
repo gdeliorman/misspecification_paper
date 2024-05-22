@@ -18,7 +18,15 @@ theme_set(
 
 # Load data set containing the computed ICAs for all scenarios.
 results_ICA_tbl = readRDS("results_ICA_tbl.rds")
+# Data set containing the parametric copulas corresponding to copula_id.
 copula_id_tbl = readRDS("copula_id_tbl.rds")
+# Data set containing the assumptions corresponding to each id.
+id_tbl = readRDS("id_tbl.rds") %>%
+  select(assumptions, id)
+
+# Add assumption variable to results_ICA_tbl.
+results_ICA_tbl = results_ICA_tbl %>%
+  left_join(id_tbl, by = "id")
 
 # We compute the average ICA for each scenario; this value is used as reference
 # value. Ideally, the ICAs lie closely to this reference value. In addition, we
@@ -98,6 +106,8 @@ results_ICA_tbl = results_ICA_tbl %>%
   summarize(lme_fit = list(lmer(
     ICA ~ 1 + (1 | id) + (1 | copula_id), data = pick(everything())
   )))
+# `data_set = "ARMD"` and `assumptions = "positive associations"` fails to
+# converge.
 
 # Extract Reliability coefficients.
 reliability_coef = function(lme_fit) {

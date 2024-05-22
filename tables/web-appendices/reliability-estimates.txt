@@ -1,19 +1,10 @@
-
-> cat("Estimated reliability coefficients for each scenario.\n\n")
 Estimated reliability coefficients for each scenario.
 
-
-> print(
-+   results_ICA_tbl %>%
-+     select(-lme_fit) %>%
-+     mutate(assumptions = forcats::fct_recode(assumptions, "no assumptions" = "no")) %>%
- .... [TRUNCATED] 
 # A tibble: 3 × 4
 # Groups:   data_set [3]
-  data_set `no assumptions` `positive associations` `positive associations and conditional independence`
-  <chr>               <dbl>                   <dbl>                                                <dbl>
-1 ARMD                0.997                   0.979                                                0.987
-2 Ovarian             0.991                   0.964                                                0.980
-3 Schizo              0.997                   0.980                                                0.987
-
-> sink()
+  data_set `no assumptions` `positive associations` positive associations and …¹
+  <chr>               <dbl>                   <dbl>                        <dbl>
+1 ARMD                0.994                   0.983                        0.988
+2 Ovarian             0.986                   0.969                        0.980
+3 Schizo              0.995                   0.983                        0.988
+# ℹ abbreviated name: ¹​`positive associations and conditional independence`
