@@ -130,6 +130,23 @@ ggsave(filename = "figures/web-appendices/vine-copula-mvn-reference-diff.png",
        units = "cm",
        dpi = res)
 
+# Print minimum and maximum for ICA_C - ICA_N in each subplot.
+sink(file = "tables/web-appendices/vine-copula-mvn-reference-diff.txt")
+cat("Minimum and maximum differences between ICA_C and ICA_N for each data set-assumptions combinations.\n\n")
+results_ICA_tbl %>%
+  mutate(
+    assumptions = forcats::fct_recode(
+      assumptions,
+      "-" = "no",
+      "PA" = "positive associations",
+      "PA + CI" = "positive associations and conditional independence"
+    ),
+    diff = ICA - mvn_ICA
+  ) %>%
+  group_by(data_set, assumptions) %>%
+  summarize("min(ICA_C - ICA_N)" = min(diff), "max(ICA_C - ICA_N)" = max(diff))
+sink()
+
 # Reliability Analysis ----------------------------------------------------
 
 # Fit mixed model for each data set-assumptions combination.
