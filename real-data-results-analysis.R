@@ -51,6 +51,11 @@ results_ICA_tbl = results_ICA_tbl %>%
   left_join(reference_ICA_tbl, by = c("id", "data_set", "assumptions")) %>%
   left_join(mvn_ICA_tbl, by = c("id", "assumptions", "data_set"))
 
+# Remove Ovarian data set from the results. We will not present these data in
+# the manuscript.
+results_ICA_tbl = results_ICA_tbl %>%
+  filter(data_set != "Ovarian")
+
 # Data Visualization ------------------------------------------------------
 results_ICA_tbl %>%
   mutate(
@@ -67,6 +72,7 @@ results_ICA_tbl %>%
   xlim(c(-0.1, 1)) +
   xlab(latex2exp::TeX("$\\bar{ICA}$")) +
   ylim(c(-0.1, 1)) +
+  ylab(latex2exp::TeX("$ICA_{C}$")) + 
   facet_grid(data_set ~ assumptions)
 ggsave(filename = "figures/web-appendices/vine-copula-mean-reference.png",
        device = "png",
@@ -88,10 +94,36 @@ results_ICA_tbl %>%
   geom_point(alpha = 0.01, size = 1) +
   geom_abline(intercept = 0, slope = 1, color = "red") +
   xlim(c(-0.1, 1)) +
-  xlab(latex2exp::TeX("$ICA_{MVN}$")) +
+  xlab(latex2exp::TeX("$ICA_{N}$")) +
   ylim(c(-0.1, 1)) +
+  ylab(latex2exp::TeX("$ICA_{C}$")) +
   facet_grid(data_set~assumptions)
 ggsave(filename = "figures/main-text/vine-copula-mvn-reference.png",
+       device = "png",
+       width = double_width,
+       height = double_height,
+       units = "cm",
+       dpi = res)
+
+results_ICA_tbl %>%
+  mutate(
+    assumptions = forcats::fct_recode(
+      assumptions,
+      "-" = "no",
+      "PA" = "positive associations",
+      "PA + CI" = "positive associations and conditional independence"
+    ),
+    diff = ICA - mvn_ICA
+  ) %>%
+  ggplot(aes(x = mvn_ICA, y = diff)) +
+  geom_point(alpha = 0.01, size = 1) +
+  geom_abline(intercept = 0, slope = 0, color = "red") +
+  xlim(c(-0.1, 1)) +
+  xlab(latex2exp::TeX("$ICA_{N}$")) +
+  # ylim(c(-0.1, 1)) +
+  ylab(latex2exp::TeX("$ICA_{C} - ICA_{N}$")) +
+  facet_grid(data_set~assumptions)
+ggsave(filename = "figures/web-appendices/vine-copula-mvn-reference-diff.png",
        device = "png",
        width = double_width,
        height = double_height,

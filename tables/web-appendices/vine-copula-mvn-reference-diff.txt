@@ -1,0 +1,12 @@
+Minimum and maximum differences between ICA_C and ICA_N for each data set-assumptions combinations.
+
+# A tibble: 6 × 4
+# Groups:   data_set [2]
+  data_set assumptions `min(ICA_C - ICA_N)` `max(ICA_C - ICA_N)`
+  <chr>    <fct>                      <dbl>                <dbl>
+1 ARMD     -                        -0.471                 0.497
+2 ARMD     PA                       -0.197                 0.214
+3 ARMD     PA + CI                  -0.0546                0.123
+4 Schizo   -                        -0.432                 0.418
+5 Schizo   PA                       -0.203                 0.222
+6 Schizo   PA + CI                  -0.0482                0.117
