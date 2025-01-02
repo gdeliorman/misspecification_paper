@@ -2,7 +2,7 @@
 
 ## Project Description
 Individual causal association (ICA) is proposed  for  normal continuous outcomes by Alonso et al. (2015). In this project, we investigate the effects of model misspecification on the behavior of ICA when the true distribution follows from the multivariate normal model.
-Specifically, we evaluate it when the potential outcome vector follows a multivariate t-distribution. We also evaluate the effect of unverifiable assumptions on the assessment of surrogacy using D-vine copula models that are indistinguishable from the multivariate 
+Specifically, we evaluate it when the potential outcome vector follows a multivariate t-distribution and log-normal distribution. We also evaluate the effect of unverifiable assumptions on the assessment of surrogacy using D-vine copula models that are indistinguishable from the multivariate 
 normal model in terms of observable data.
 
 
