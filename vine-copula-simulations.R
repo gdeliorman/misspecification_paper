@@ -1,17 +1,25 @@
 # Preparation -------------------------------------------------------------
-
+# Load required packages.
 library(tidyverse)
 library(compositions)
 library(rvinecopulib)
 library(Surrogate)
+# Number of cores for parallel computations. This should be changed depending on
+# the computer on which this code is run.
 ncores = 10
+# Number of samples from the multivariate lognormal distribution for each set of
+# parameters.
 n_lognormal = 2e3
+# Number of Monte Carlo replicates for computing the ICA given the D-vine distribution.
 n_prec = 1e4
 
-# Read in sampled parameters.
+# Read in sampled parameters (produced by Gökçe)..
 Sigma_df = readxl::read_excel("Log_normal_results_23december.xlsx", sheet = 3)
 mu_df = readxl::read_excel("Log_normal_results_23december.xlsx", sheet = 2)
-# Convert imported data to a tibble with matrices as elements.
+
+# Convert imported data to a tibble with matrices as elements. We should have
+# one row per set of sampled parameters for the multivariate lognormal
+# distribution.
 parameters_tbl = Sigma_df %>%
   group_by(i) %>%
   summarize(Sigma = list(matrix(c(sigma1, sigma2, sigma3, sigma4), ncol = 4))) %>%
@@ -25,11 +33,14 @@ sample_lnormal = function(n, mu, Sigma) {
   rlnorm.rplus(n, mu, Sigma)
 }
 
-# Function to fit the D-vine copula to the simulated data.
+# Function to fit the D-vine copula to the simulated data. This function only
+# estimates the parameters of the D-vine copula, the marginal distributions are
+# not estimated here. Note that this function also estimates the rotation
+# parameter.
 fit_dvine_copula = function(data, copula_family){
   # Convert data to pseudo-observations with uniform margins. 
   u = pseudo_obs(data)
-  # Estimate copula parameters.
+  # Estimate the copula parameters.
   fitted_vine = vinecop(
     data = u, 
     family_set = copula_family,
@@ -39,7 +50,7 @@ fit_dvine_copula = function(data, copula_family){
   return(fitted_vine)
 }
 
-# Extract required parameters from fitted D-vine copula model.
+# Function to extract required parameters from fitted D-vine copula model.
 extract_params_dvine = function(fitted_object) {
   copula_par = summary(fitted_object)$parameters %>% as.numeric()
   rotation_par = summary(fitted_object)$rotation
@@ -56,7 +67,7 @@ extract_params_dvine = function(fitted_object) {
   )
 }
 
-# Function to fit (log)normal marginal distribution
+# Function to fit (log)normal marginal distribution.
 fit_marginal = function(x, distr_family = "lognormal"){
   if (distr_family == "lognormal") {
     # Parameters of the lognormal distribution are estimated through maximum likelihood.
@@ -111,6 +122,8 @@ compute_ICA = function(copula_par,
   )
 }
 
+# Function to estimate the ICA given a data set and parametric choices for the
+# D-vine copula model (distr_family and copula_family).
 estimate_ICA = function(data, distr_family, copula_family, seed = 1, n_prec = 1e4) {
   # Estimate dvine copula model.
   fitted_dvine = fit_dvine_copula(data, copula_family)
@@ -150,6 +163,7 @@ compute_ICA_lognormal = function(mu,
   data = sample_lnormal(n_lognormal, mu, Sigma)
   # Estimate ICA.
   estimated_ICA = NA
+  
   try({
     estimated_ICA = estimate_ICA(
       data = data,
@@ -183,7 +197,7 @@ list_distr_family = simulation_parameters_tbl$distr_family
 list_copula_family = simulation_parameters_tbl$copula_family
 # Compute the ICA for all settings.
 a = Sys.time()
-cl = parallel::makeCluster(ncores)
+cl = parallel::makePSOCKcluster(ncores)
 parallel::clusterExport(
   cl = cl,
   varlist = c(
@@ -192,10 +206,15 @@ parallel::clusterExport(
     "extract_params_dvine",
     "fit_marginal",
     "compute_ICA",
-    "estimate_ICA",
-    "compute_ICA_lognormal"
+    "estimate_ICA"
   )
 )
+# When creating workers, the workers do no automatically get the correct
+# libpaths. We extract the current libpaths and then set the libpaths in the
+# workers.
+libs = .libPaths()
+parallel::clusterExport(cl, "libs")
+parallel::clusterEvalQ(cl, .libPaths(libs))
 parallel::clusterEvalQ(cl = cl, {
   library(tidyverse)
   library(compositions)
@@ -218,8 +237,8 @@ ICA_vec = parallel::clusterMap(
 parallel::stopCluster(cl)
 print(Sys.time() - a)
 # Add computed ICAs to the tibble.
-simulation_dvine_results_tbl = simulation_parameters_tbl %>%
-  mutate(ICA_vec)
+simulation_dvine_results_tbl = simulation_parameters_tbl
+simulation_dvine_results_tbl$ICA = ICA_vec
 
 # Save Results ------------------------------------------------------------
 saveRDS(simulation_dvine_results_tbl,
