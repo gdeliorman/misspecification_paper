@@ -121,7 +121,7 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-61",
+      "Version": "7.3-60.0.1",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -132,7 +132,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "0cafd6f0500e5deba33be22c46bf6055"
+      "Hash": "b765b28387acc8ec9e9c1530713cb19c"
     },
     "MBESS": {
       "Package": "MBESS",
@@ -157,7 +157,7 @@
     },
     "Matrix": {
       "Package": "Matrix",
-      "Version": "1.7-1",
+      "Version": "1.6-5",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -170,7 +170,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "5122bb14d8736372411f955e1b16bc8a"
+      "Hash": "8c7115cd3a0e048bda2a7cd110549f7a"
     },
     "MatrixModels": {
       "Package": "MatrixModels",
@@ -517,7 +517,7 @@
     },
     "boot": {
       "Package": "boot",
-      "Version": "1.3-31",
+      "Version": "1.3-29",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -525,7 +525,7 @@
         "graphics",
         "stats"
       ],
-      "Hash": "de2a4646c18661d6a0a08ec67f40b7ed"
+      "Hash": "a0cb8a465a115fd8460cab1a5b18a5f3"
     },
     "broom": {
       "Package": "broom",
@@ -678,13 +678,13 @@
     },
     "codetools": {
       "Package": "codetools",
-      "Version": "0.2-20",
+      "Version": "0.2-19",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "R"
       ],
-      "Hash": "61e097f35917d342622f21cdc79c256e"
+      "Hash": "c089a619a7fae175d149d89164f8c7d8"
     },
     "colorspace": {
       "Package": "colorspace",
@@ -734,7 +734,7 @@
     },
     "copula": {
       "Package": "copula",
-      "Version": "1.1-4",
+      "Version": "1.1-3",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -754,7 +754,7 @@
         "stats",
         "stats4"
       ],
-      "Hash": "df09c10acb4075e42544b6006e4b6dd2"
+      "Hash": "a8d13c181ac944e21e17022b0836eb0d"
     },
     "cpp11": {
       "Package": "cpp11",
@@ -1569,7 +1569,7 @@
     },
     "lattice": {
       "Package": "lattice",
-      "Version": "0.22-6",
+      "Version": "0.22-5",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -1580,7 +1580,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "cc5ac1ba4c238c7ca9fa6a87ca11a7e2"
+      "Hash": "7c5e89f04e72d6611c77451f6331a091"
     },
     "latticeExtra": {
       "Package": "latticeExtra",
@@ -2077,7 +2077,7 @@
     },
     "pcaPP": {
       "Package": "pcaPP",
-      "Version": "2.0-5",
+      "Version": "2.0-4",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -2085,7 +2085,7 @@
         "methods",
         "mvtnorm"
       ],
-      "Hash": "5e27d30304bd76dc55a9af1ec6959168"
+      "Hash": "55e85f05d479f9c8644f94900bbefd56"
     },
     "pillar": {
       "Package": "pillar",
@@ -2199,18 +2199,18 @@
     },
     "ps": {
       "Package": "ps",
-      "Version": "1.8.1",
+      "Version": "1.7.6",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "utils"
       ],
-      "Hash": "b4404b1de13758dea1c0484ad0d48563"
+      "Hash": "dd2b9319ee0656c8acf45c7f40c59de7"
     },
     "pspline": {
       "Package": "pspline",
-      "Version": "1.0-21",
+      "Version": "1.0-19",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -2218,7 +2218,7 @@
         "graphics",
         "stats"
       ],
-      "Hash": "7d8bf3ff3226cb2ee83b5ee3c81b9b66"
+      "Hash": "c3b2cb25b3f5cd6ead9e3934170da0cf"
     },
     "purrr": {
       "Package": "purrr",
@@ -2351,13 +2351,13 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "1.0.11",
+      "Version": "1.0.2",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "utils"
       ],
-      "Hash": "47623f66b4e80b3b0587bc5d7b309888"
+      "Hash": "4b22ac016fe54028b88d0c68badbd061"
     },
     "reprex": {
       "Package": "reprex",
@@ -2675,14 +2675,14 @@
     },
     "stabledist": {
       "Package": "stabledist",
-      "Version": "0.7-2",
+      "Version": "0.7-1",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "R",
         "stats"
       ],
-      "Hash": "b399e5007fe512f314d74b41fa7e4a41"
+      "Hash": "dfd9740f06248fb6721d38df2e14ed7b"
     },
     "statmod": {
       "Package": "statmod",

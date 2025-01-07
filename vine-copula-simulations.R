@@ -96,32 +96,6 @@ fit_marginal = function(x, distr_family = "lognormal"){
               q = est_q))
 }
 
-# Function to estimate the ICA given the fitted D-vine copula model.
-compute_ICA = function(copula_par,
-                       rotation_par,
-                       copula_family1,
-                       copula_family2,
-                       q_S0,
-                       q_T0,
-                       q_S1,
-                       q_T1,
-                       seed = 1,
-                       n_prec = 1e4) {
-  Surrogate:::compute_ICA_ContCont(
-    copula_par = copula_par,
-    rotation_par = rotation_par,
-    copula_family1 = copula_family1,
-    copula_family2 = copula_family2,
-    n_prec = n_prec,
-    q_S0 = q_S0,
-    q_T0 = q_T0,
-    q_S1 = q_S1,
-    q_T1 = q_T1,
-    seed = seed,
-    marginal_sp_rho = FALSE
-  )
-}
-
 # Function to estimate the ICA given a data set and parametric choices for the
 # D-vine copula model (distr_family and copula_family).
 estimate_ICA = function(data, distr_family, copula_family, seed = 1, n_prec = 1e4) {
@@ -135,8 +109,8 @@ estimate_ICA = function(data, distr_family, copula_family, seed = 1, n_prec = 1e
   est_marg2 = fit_marginal(data[, 2], distr_family)
   est_marg3 = fit_marginal(data[, 3], distr_family)
   est_marg4 = fit_marginal(data[, 4], distr_family)
-  
-  computed_ICA_row = compute_ICA(
+
+  computed_ICA_row = Surrogate:::compute_ICA_ContCont(
     copula_par = dvine_params$copula_par,
     rotation_par = dvine_params$rotation_par,
     copula_family1 = dvine_params$copula_family1,
@@ -152,18 +126,22 @@ estimate_ICA = function(data, distr_family, copula_family, seed = 1, n_prec = 1e
   return(computed_ICA_row["ICA"])
 }
 
-compute_ICA_lognormal = function(mu,
-                                 Sigma,
-                                 distr_family,
-                                 copula_family,
-                                 seed = 1,
-                                 n_lognormal,
-                                 n_prec) {
+compute_ICA = function(mu,
+                       Sigma,
+                       distr_family,
+                       copula_family,
+                       seed = 1,
+                       n_lognormal,
+                       n_prec) {
   # Simulate multivariate lognormal data.
   data = sample_lnormal(n_lognormal, mu, Sigma)
   # Estimate ICA.
   estimated_ICA = NA
   
+  # Errors can occur if FNN::mutinfo fails. This function fails due to numerical
+  # problems if the values in data are to large, e.g., 1e17. These errors are
+  # converted to NAs for the ICA, but they should be addressed fundamentally by
+  # choosing more realistic data generating mechanisms.
   try({
     estimated_ICA = estimate_ICA(
       data = data,
@@ -195,6 +173,14 @@ list_mu = simulation_parameters_tbl %>%
 list_Sigma = simulation_parameters_tbl$Sigma
 list_distr_family = simulation_parameters_tbl$distr_family
 list_copula_family = simulation_parameters_tbl$copula_family
+
+## Parallel Computations --------------------------------------------------
+
+# Below are the code for doing the computations in parallel with ncores
+# (specified in the beginning of this file). This code section can be commented
+# if you want to run the code sequentially. Don't forget to uncomment the next
+# section in that case.
+
 # Compute the ICA for all settings.
 a = Sys.time()
 cl = parallel::makePSOCKcluster(ncores)
@@ -223,7 +209,7 @@ parallel::clusterEvalQ(cl = cl, {
 })
 ICA_vec = parallel::clusterMap(
   cl = cl, 
-  fun = compute_ICA_lognormal,
+  fun = compute_ICA,
   mu = list_mu,
   Sigma = list_Sigma,
   distr_family = list_distr_family,
@@ -236,11 +222,31 @@ ICA_vec = parallel::clusterMap(
 ) %>% as.numeric()
 parallel::stopCluster(cl)
 print(Sys.time() - a)
+
+## Sequential Computations ------------------------------------------------
+
+# Below is the code to run the computations sequentially. If you want to run
+# this code, the code in the previous section should be commented.
+
+# ICA_vec = mapply(
+#   FUN = compute_ICA,
+#   mu = list_mu,
+#   Sigma = list_Sigma,
+#   distr_family = list_distr_family,
+#   copula_family = list_copula_family, 
+#   MoreArgs = list(
+#     seed = 1,
+#     n_lognormal = n_lognormal,
+#     n_prec = n_prec
+#   ) 
+# ) %>% as.numeric()
+
+# Save Results ------------------------------------------------------------
+
 # Add computed ICAs to the tibble.
 simulation_dvine_results_tbl = simulation_parameters_tbl
 simulation_dvine_results_tbl$ICA = ICA_vec
 
-# Save Results ------------------------------------------------------------
 saveRDS(simulation_dvine_results_tbl,
         "simulation_dvine_results_tbl.rds")
 
