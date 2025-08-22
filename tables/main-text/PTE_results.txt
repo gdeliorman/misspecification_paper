@@ -1,0 +1,10 @@
+
+> print(results)
+# A tibble: 3 × 4
+  Method     PTE Lower_CI Upper_CI
+  <chr>    <dbl>    <dbl>    <dbl>
+1 Robust   0.864    0.667    1.01 
+2 Model    0.849    0.610    0.976
+3 Freedman 0.847    0.633    0.991
+
+> sink()

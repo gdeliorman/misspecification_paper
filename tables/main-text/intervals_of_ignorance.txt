@@ -1,0 +1,21 @@
+
+> intervals_of_ignorance_tbl %>%
++   left_join(copula_id_tbl, by = "copula_id")
+# A tibble: 768 × 8
+# Groups:   copula_id [256]
+   copula_id assumptions            lower_bound upper_bound c23   c13_2 c24_3 c14_23
+       <int> <chr>                        <dbl>       <dbl> <chr> <chr> <chr> <chr> 
+ 1         1 no                        -0.00940       0.990 gaus… gaus… gaus… gauss…
+ 2         1 positive associations     -0.0247        0.815 gaus… gaus… gaus… gauss…
+ 3         1 positive associations…     0.0703        0.846 gaus… gaus… gaus… gauss…
+ 4         2 no                        -0.0112        0.989 gaus… gaus… gaus… clayt…
+ 5         2 positive associations     -0.0148        0.809 gaus… gaus… gaus… clayt…
+ 6         2 positive associations…     0.0814        0.844 gaus… gaus… gaus… clayt…
+ 7         3 no                        -0.0106        0.987 gaus… gaus… gaus… frank 
+ 8         3 positive associations     -0.0163        0.784 gaus… gaus… gaus… frank 
+ 9         3 positive associations…     0.0667        0.821 gaus… gaus… gaus… frank 
+10         4 no                        -0.0133        0.990 gaus… gaus… gaus… gumbel
+# ℹ 758 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+> sink()
