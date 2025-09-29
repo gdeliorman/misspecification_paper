@@ -221,7 +221,7 @@ plot_tbl = results_ICA_tbl %>%
 plot_tbl %>%
   filter(data_set == "Schizo") %>%
   ggplot(aes(x = ICA)) +
-  geom_histogram(bins = 15, fill = "gray", color = "black") +
+  geom_density() +
   xlab("ICA") +
   ylab("Frequency") +
   facet_grid(copula_description ~ assumptions) +
@@ -237,7 +237,7 @@ ggsave(
 plot_tbl %>%
   filter(data_set == "ARMD") %>%
   ggplot(aes(x = ICA)) +
-  geom_histogram(bins = 15, fill = "gray", color = "black") +
+  geom_density() +
   xlab("ICA") +
   ylab("Frequency") +
   facet_grid(copula_description ~ assumptions) +
@@ -253,7 +253,7 @@ ggsave(
 plot_tbl %>%
   filter(data_set == "Ovarian") %>%
   ggplot(aes(x = ICA)) +
-  geom_histogram(bins = 15, fill = "gray", color = "black") +
+  geom_density() +
   xlab("ICA") +
   ylab("Frequency") +
   facet_grid(copula_description ~ assumptions) +
