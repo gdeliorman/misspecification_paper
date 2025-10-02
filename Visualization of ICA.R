@@ -1,14 +1,35 @@
 ##Visualization of ICA values in Schizophrenia data
 
 ##read ICA values
+
+##ICA normal with grid=seq(-1, 1, by=.1)
 Ica_normal_schizo<-load("Ica_normal_schizo.rda")
+Ica_normal_schizo_newgrid<-load("Ica_normal_schizo.rda")
 Ica_normal_schizo<-get(Ica_normal_schizo)
 
+##ICA normal with wider grid=seq(-1, 1, by=.025)
+Ica_normal_schizo_newgrid<-load("Ica_normal_schizo_newgrid.rda")
+Ica_normal_schizo_newgrid<-get(Ica_normal_schizo_newgrid)
+
+
+##ICA_t with grid=seq(-1, 1, by=.1)
 Ica_t_schizo<-load("Ica_t_schizo.rda")
+Ica_t_schizo_newgrid<-load("Ica_t_schizo.rda")
 Ica_t_schizo<-get(Ica_t_schizo)
 
+
+##ICA_t with wider grid=seq(-1, 1, by=.025)
+Ica_t_schizo_newgrid<-load("Ica_t_schizo_newgrid.rda")
+Ica_t_schizo_newgrid<-get(Ica_t_schizo_newgrid)
+
+##ICA log-normal with grid=seq(-1, 1, by=.05)
 Ica_lognormal_schizo<-load("Ica_lognormal_schizo.rda")
+Ica_lognormal_schizo_newgrid<-load("Ica_lognormal_schizo.rda")
 Ica_lognormal_schizo<-get(Ica_lognormal_schizo)
+
+##ICA log-normal with wider grid=seq(-1, 1, by=.025)
+Ica_lognormal_schizo_newgrid<-load("Ica_lognormal_schizo_newgrid.rda")
+Ica_lognormal_schizo_newgrid<-get(Ica_lognormal_schizo_newgrid)
 
 ##summarize 
 s1<-summary(Ica_normal_schizo)
@@ -17,25 +38,36 @@ s3<-summary(Ica_lognormal_schizo)
 summary_table <- bind_rows(s1, s2, s3)
 print(summary_table)
 
+##summarize wider grid
+s1<-summary(Ica_normal_schizo_newgrid)
+s2<-summary(Ica_t_schizo_newgrid)
+s3<-summary(Ica_lognormal_schizo_newgrid)
+summary_table <- bind_rows(s1, s2, s3)
+print(summary_table)
+
+Ica_normal_schizo<- Ica_normal_schizo_newgrid
+Ica_lognormal_schizo<- Ica_lognormal_schizo_newgrid
+Ica_t_schizo<- Ica_t_schizo_newgrid
+
 ##histograms 
-hist(Ica_normal_schizo, xlim = c(0,1), ylim=c(0,200), main=bquote("Histogram of ICA"[N]), xlab=bquote("ICA"[N]))
+hist(Ica_normal_schizo, xlim = c(0,1), ylim=c(0,11200), main=bquote("Histogram of ICA"[N]), xlab=bquote("ICA"[N]))
 grid()
 box()
 
-hist(Ica_t_schizo, xlim = c(0,1), ylim=c(0,200), main=bquote("Histogram of ICA"[t]), xlab=bquote("ICA"[t]))
+hist(Ica_t_schizo, xlim = c(0,1), ylim=c(0,119200), main=bquote("Histogram of ICA"[t]), xlab=bquote("ICA"[t]))
 grid()
 box()
 
 
 
-hist(Ica_lognormal_schizo, xlim = c(0,1), ylim=c(0,1200), main=bquote("Histogram of ICA"[L]), xlab=bquote("ICA"[L]))
+hist(Ica_lognormal_schizo, xlim = c(0,1), ylim=c(0,11200), main=bquote("Histogram of ICA"[L]), xlab=bquote("ICA"[L]))
 grid()
 box()
 
 ##densities
 plot(density(Ica_normal_schizo),
      xlim = c(0,1),     # density için de sınırlama yapabilirsin
-     ylim = c(0, 50), 
+     ylim = c(0, 30), 
      main = "",
      xlab = "ICA", 
      col = "blue", lwd = 2, lty = 1)
